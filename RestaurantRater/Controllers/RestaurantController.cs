@@ -51,6 +51,20 @@ namespace RestaurantRater.Controllers
             return View(restaurant);
         }
 
+        public ActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Restaurant restaurant = db.Restaurants.Find(id);
+            if (restaurant == null)
+            {
+                return HttpNotFound();
+            }
+            return View(restaurant);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "RestaurantID,Name,Address,Rating")] Restaurant restaurant)
@@ -95,5 +109,7 @@ namespace RestaurantRater.Controllers
             }
             return View(restaurant);
         }
+
+
     }
 }
