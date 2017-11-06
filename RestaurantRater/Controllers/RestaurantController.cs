@@ -1,5 +1,6 @@
 ﻿using RestaurantRater.Models;
 using System.Linq;
+using System.Net;
 using System.Web.Mvc;
 using static RestaurantRater.Models.Restaurant;
 
@@ -19,10 +20,23 @@ namespace RestaurantRater.Controllers
         {
             return View();
         }
+        public ActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Restaurant restaurant = db.Restaurants.Find(id);
+            if (restaurant == null)
+            {
+                return HttpNotFound();
+            }
+            return View(restaurant);
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "RestaurantID,Name")] Restaurant restaurant)
+        public ActionResult Create([Bind(Include = "RestaurantID,Name,Address,Rating")] Restaurant restaurant)
         {
             if (ModelState.IsValid)
             {
@@ -31,6 +45,25 @@ namespace RestaurantRater.Controllers
                 return RedirectToAction("Index");
             }
             return View(restaurant);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            Restaurant restaurant = db.Restaurants.Find(id);
+            db.Restaurants.Remove(restaurant);
+            db.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }
